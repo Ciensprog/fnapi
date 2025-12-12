@@ -1,7 +1,11 @@
 import z from 'zod'
 
 import { zoneCategories } from '../../../config/contants'
-import { worldInfoMission, worldInfoMissionAlert } from './world-info'
+import {
+  worldInfoMission,
+  worldInfoMissionAlert,
+  worldInfoTileSchema,
+} from './world-info'
 
 export type MissionParsed = z.infer<typeof missionParsedSchema>
 export type WorldInfoParsed = z.infer<typeof worldInfoParsedSchema>
@@ -34,6 +38,9 @@ export const missionParsedSchema = z.object({
 
   mission: z.object({
     id: z.string(),
+    difficulty: z.object({
+      powerLevel: z.number(),
+    }),
     tileIndex: z.number(),
     modifiers: z.array(
       z.object({
@@ -41,7 +48,6 @@ export const missionParsedSchema = z.object({
         templateId: z.string(),
       })
     ),
-    powerLevel: z.number(),
     rewards: z.array(
       z.object({
         id: z.string().nullable(),
@@ -54,13 +60,18 @@ export const missionParsedSchema = z.object({
       })
     ),
     zone: z.object({
+      zoneType: z.string(),
+      biome: z
+        .object({
+          id: z.string(),
+          tile: worldInfoTileSchema,
+        })
+        .nullable(),
       theme: z.object({
+        id: z.enum(Object.keys(zoneCategories)),
         generator: z.string(),
         isGroup: z.boolean(),
         matches: z.array(z.string()),
-        type: z.object({
-          id: z.enum(Object.keys(zoneCategories)),
-        }),
       }),
     }),
   }),

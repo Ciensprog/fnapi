@@ -6,14 +6,27 @@ import {
   type WorldInfo,
   type WorldInfoMissionAlert,
   worldInfoSchema,
+  type WorldInfoTheater,
 } from './schemas/world-info'
 import {
+  availableBiomes,
   availableWorlds,
+  StormKingZones,
+  worldPowerLevels,
   Worlds,
   zoneCategories,
 } from '../../config/contants'
 
-export * from '../../config/contants'
+export {
+  Biomes,
+  StormKingZones,
+  WorldModifiers,
+  Worlds,
+  availableBiomes,
+  availableWorlds,
+  worldPowerLevels,
+  zoneCategories,
+} from '../../config/contants'
 
 export type WorldInfoParserConfig = {
   data?: WorldInfo | null
@@ -69,9 +82,12 @@ export class WorldInfoParser {
       return parsed
     }
 
+    const tiles: Record<string, WorldInfoTheater['tiles']> = {}
+
     Object.values(worldInfo.theaters).forEach((theater) => {
       if (availableWorlds.includes(theater.uniqueId)) {
         parsed[theater.uniqueId] = {}
+        tiles[theater.uniqueId] = theater.tiles
       }
     })
 
@@ -111,7 +127,7 @@ export class WorldInfoParser {
           ] ?? null
         let alertParsed: MissionParsed['alert'] = null
 
-        const zoneInfo = this.parseZone({
+        const zoneTheme = this.parseZone({
           missionGenerator: mission.missionGenerator,
           theaterId,
         })
@@ -165,6 +181,40 @@ export class WorldInfoParser {
           quantity,
         }))
 
+        const tile = tiles[theaterId]?.[mission.tileIndex] ?? null
+        const biome: MissionParsed['mission']['zone']['biome'] = tile
+          ? {
+              id: 'unknown',
+              tile,
+            }
+          : null
+
+        if (biome) {
+          const getBiomeId = availableBiomes.find((item) =>
+            biome.tile.zoneTheme.includes(item)
+          )
+
+          if (getBiomeId) {
+            biome.id = getBiomeId
+          }
+        }
+
+        const currentZoneType = mission.missionDifficultyInfo.rowName
+          .replace('Theater_', '')
+          .replace('_Group', '')
+        let zoneType = currentZoneType
+
+        if (currentZoneType === StormKingZones.CannyValley) {
+          zoneType = 'Hard_Zone5'
+        } else if (currentZoneType === StormKingZones.TwinePeaks) {
+          zoneType = 'Endgame_Zone5'
+        }
+
+        const powerLevel =
+          (worldPowerLevels as any)[theaterId]?.[zoneType] ??
+          (worldPowerLevels.ventures as any)?.[zoneType] ??
+          0
+
         mission.missionRewards.items.forEach((reward) => {
           filters.push(reward.itemType)
         })
@@ -179,12 +229,18 @@ export class WorldInfoParser {
           mission: {
             modifiers,
             id: missionGuid,
+            difficulty: {
+              powerLevel,
+            },
             tileIndex: tileIndex,
-            powerLevel: 0,
             rewards: missionRewards.map((reward) =>
               this.parseResource(reward)
             ),
-            zone: zoneInfo,
+            zone: {
+              zoneType,
+              biome,
+              theme: zoneTheme,
+            },
           },
 
           raw: {
@@ -200,6 +256,12 @@ export class WorldInfoParser {
     }
 
     this._parsed = parsed
+
+    console.log(
+      this._parsed['33A2311D4AE64B361CCE27BC9F313C8B'][
+        '4c0daf8d-3ef3-41bc-9617-78573b3dd147'
+      ].mission
+    )
 
     return this._parsed
   }
@@ -286,15 +348,11 @@ export class WorldInfoParser {
     const current = Object.entries(zoneCategories).find(([, patterns]) =>
       patterns.some((pattern) => generator.includes(pattern))
     )
-    const data: MissionParsed['mission']['zone'] = {
-      theme: {
-        generator,
-        matches: [],
-        isGroup: false,
-        type: {
-          id: 'unknown',
-        },
-      },
+    const data: MissionParsed['mission']['zone']['theme'] = {
+      generator,
+      id: 'unknown',
+      matches: [],
+      isGroup: false,
     }
 
     if (!current) {
@@ -311,9 +369,9 @@ export class WorldInfoParser {
         ? false
         : generator.toLowerCase().includes('group')
 
-    data.theme.isGroup = isGroup
-    data.theme.matches = matches
-    data.theme.type.id = newKey
+    data.id = newKey
+    data.isGroup = isGroup
+    data.matches = matches
 
     return data
   }

@@ -35,8 +35,8 @@ export enum Biomes {
   TheOutpost_PvE_03 = 'TheOutpost_PvE_03',
   TheOutpost_PvE_04 = 'TheOutpost_PvE_04',
 
-  GhostTown = 'GhostTown',
   GhostTown_HighNoon = 'GhostTown_HighNoon',
+  GhostTown = 'GhostTown',
 
   // Tropical zone
   Island = 'Island',
@@ -45,32 +45,32 @@ export enum Biomes {
 
   TheForest = 'TheForest',
 
-  Route99 = 'Route99',
   Route99_Bunker = 'Route99_Bunker',
   Route99_Landmark = 'Route99_Landmark',
+  Route99 = 'Route99',
 
-  TheGrasslands = 'TheGrasslands',
   TheGrasslands_Mansion = 'TheGrasslands_Mansion',
+  TheGrasslands = 'TheGrasslands',
 
-  TheCity = 'TheCity',
   TheCity_Arid = 'TheCity_Arid',
+  TheCity = 'TheCity',
 
-  TheIndustrialPark = 'TheIndustrialPark',
   TheIndustrialPark_Arid = 'TheIndustrialPark_Arid',
+  TheIndustrialPark = 'TheIndustrialPark',
 
-  TheSuburbs = 'TheSuburbs',
   TheSuburbs_Arid = 'TheSuburbs_Arid',
+  TheSuburbs = 'TheSuburbs',
 
-  Desert = 'Desert',
   Desert_Bunker = 'Desert_Bunker',
   Desert_DeployProbe = 'Desert_DeployProbe',
   Desert_Monument = 'Desert_Monument',
+  Desert = 'Desert',
   TheDesert = 'TheDesert',
 
   // Storm King
 
-  DUDEBRO = 'DUDEBRO',
   DUDEBRO_HARD = 'DUDEBRO_HARD',
+  DUDEBRO = 'DUDEBRO',
 
   // Quests
 
@@ -218,6 +218,74 @@ export const availableWorlds: Array<string> = [
   Worlds.Hexsylvania,
   Worlds.ScurvyShoals,
   Worlds.FrozenFjords,
+]
+
+export const availableBiomes: Array<string> = [
+  Biomes.CriticalMission,
+  Biomes.TheOutpost_PvE_01,
+  Biomes.TheOutpost_PvE_02,
+  Biomes.TheOutpost_PvE_03,
+  Biomes.TheOutpost_PvE_04,
+
+  Biomes.GhostTown_HighNoon,
+  Biomes.GhostTown,
+
+  Biomes.Island,
+
+  Biomes.Lakeside,
+
+  Biomes.TheForest,
+
+  Biomes.Route99_Bunker,
+  Biomes.Route99_Landmark,
+  Biomes.Route99,
+
+  Biomes.TheGrasslands_Mansion,
+  Biomes.TheGrasslands,
+
+  Biomes.TheCity_Arid,
+  Biomes.TheCity,
+
+  Biomes.TheIndustrialPark_Arid,
+  Biomes.TheIndustrialPark,
+
+  Biomes.TheSuburbs_Arid,
+  Biomes.TheSuburbs,
+
+  Biomes.Desert_Bunker,
+  Biomes.Desert_DeployProbe,
+  Biomes.Desert_Monument,
+  Biomes.Desert,
+  Biomes.TheDesert,
+
+  Biomes.DUDEBRO_HARD,
+  Biomes.DUDEBRO,
+
+  Biomes.LongWayHome,
+  Biomes.PlankHarbor,
+  Biomes.StabilizeTheRift,
+  Biomes.BuildOff,
+  Biomes.Onboarding_Forest,
+  Biomes.Onboarding_Grasslands,
+  Biomes.Onboarding_Suburban,
+  Biomes.Onboarding_Fort,
+  Biomes.VindermansLab,
+  Biomes.TRV_HF,
+  Biomes.Water,
+
+  Biomes.Homebase_02,
+  Biomes.Homebase_03,
+  Biomes.Homebase_05,
+  Biomes.Homebase_06,
+  Biomes.Homebase_07,
+
+  Biomes.Starlight_D1,
+  Biomes.Starlight_D2,
+  Biomes.Starlight_D3,
+  Biomes.Starlight_D4,
+  Biomes.Starlight_D5_Science,
+
+  Biomes.PerfMem,
 ]
 
 export const zoneCategories = {
