@@ -104,6 +104,25 @@ export enum Biomes {
   Starlight_D4 = 'Starlight_D4',
   Starlight_D5_Science = 'Starlight_D5_Science',
 
+  // Phoenix
+
+  /**
+   * @name Boreal Base
+   */
+  Phoenix_Winter_Stonewood_1_Arctic = 'Phoenix_Winter_Stonewood_1_Arctic',
+  /**
+   * @name Crackshot's Neighborhood
+   */
+  Winter_Stonewood = 'Winter_Stonewood',
+  /**
+   * @name Crackshot's Neighborhood
+   */
+  Winter_Canny = 'Winter_Canny',
+  /**
+   * @name Chilly Cove
+   */
+  Winter = 'Winter',
+
   // Extra
 
   PerfMem = 'PerfMem',
@@ -288,6 +307,11 @@ export const availableBiomes: Array<string> = [
   Biomes.Starlight_D3,
   Biomes.Starlight_D4,
   Biomes.Starlight_D5_Science,
+
+  Biomes.Phoenix_Winter_Stonewood_1_Arctic,
+  Biomes.Winter_Stonewood,
+  Biomes.Winter_Canny,
+  Biomes.Winter,
 
   Biomes.PerfMem,
 ]
