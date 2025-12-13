@@ -5,6 +5,8 @@ import { worldInfoParsedSchema } from '../../src/parsers/stw/schemas/parsed-worl
 
 import wiv1 from '../_data/world-info-v1.json'
 import wiv2 from '../_data/world-info-v2.json'
+import wiv3 from '../_data/world-info-v3.json'
+import wiv4 from '../_data/world-info-v4.json'
 
 describe('Parsing world info v1', () => {
   test('Update data on fly', () => {
@@ -76,6 +78,84 @@ describe('Parsing world info v2', () => {
   test('Successfully parsed world info', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv2,
+    })
+    const parsed = worldInfo.parse()
+    const result = worldInfoParsedSchema.safeParse(parsed)
+
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('Parsing world info v3', () => {
+  test('Update data on fly', () => {
+    const worldInfo = new WorldInfoParser()
+
+    expect(worldInfo.raw).toBeNull()
+
+    worldInfo.updateData(wiv3)
+    expect(worldInfo.raw).not.toBeNull()
+
+    worldInfo.updateData()
+    expect(worldInfo.raw).toBeNull()
+
+    worldInfo.updateData(wiv3)
+    expect(worldInfo.raw).not.toBeNull()
+  })
+
+  test('Check available theaters', () => {
+    const worldInfo = new WorldInfoParser({
+      data: wiv3,
+    })
+    const parsed = worldInfo.parse()
+    const validation = Object.keys(parsed)
+
+    expect(
+      validation.every((theaterId) => availableWorlds.includes(theaterId))
+    ).toBe(true)
+  })
+
+  test('Successfully parsed world info', () => {
+    const worldInfo = new WorldInfoParser({
+      data: wiv3,
+    })
+    const parsed = worldInfo.parse()
+    const result = worldInfoParsedSchema.safeParse(parsed)
+
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('Parsing world info v4', () => {
+  test('Update data on fly', () => {
+    const worldInfo = new WorldInfoParser()
+
+    expect(worldInfo.raw).toBeNull()
+
+    worldInfo.updateData(wiv4)
+    expect(worldInfo.raw).not.toBeNull()
+
+    worldInfo.updateData()
+    expect(worldInfo.raw).toBeNull()
+
+    worldInfo.updateData(wiv4)
+    expect(worldInfo.raw).not.toBeNull()
+  })
+
+  test('Check available theaters', () => {
+    const worldInfo = new WorldInfoParser({
+      data: wiv4,
+    })
+    const parsed = worldInfo.parse()
+    const validation = Object.keys(parsed)
+
+    expect(
+      validation.every((theaterId) => availableWorlds.includes(theaterId))
+    ).toBe(true)
+  })
+
+  test('Successfully parsed world info', () => {
+    const worldInfo = new WorldInfoParser({
+      data: wiv4,
     })
     const parsed = worldInfo.parse()
     const result = worldInfoParsedSchema.safeParse(parsed)
