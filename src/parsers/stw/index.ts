@@ -11,6 +11,7 @@ import {
 import {
   availableBiomes,
   availableWorlds,
+  EndgameZones,
   StormKingZones,
   worldPowerLevels,
   Worlds,
@@ -19,6 +20,7 @@ import {
 
 export {
   Biomes,
+  EndgameZones,
   StormKingZones,
   WorldModifiers,
   Worlds,
@@ -135,6 +137,22 @@ export class WorldInfoParser {
           this.parseModifiers(alert?.missionAlertModifiers)
         const filters: MissionParsed['filters'] = []
 
+        const currentZoneType = mission.missionDifficultyInfo.rowName
+          .replace('Theater_', '')
+          .replace('_Group', '')
+        let zoneType = currentZoneType
+
+        if (currentZoneType === StormKingZones.CannyValley) {
+          zoneType = 'Hard_Zone5'
+        } else if (currentZoneType === StormKingZones.TwinePeaks) {
+          zoneType = 'Endgame_Zone5'
+        }
+
+        const powerLevel =
+          (worldPowerLevels as any)[theaterId]?.[zoneType] ??
+          (worldPowerLevels.ventures as any)?.[zoneType] ??
+          0
+
         if (alert) {
           const alertRewards = Object.entries(
             alert.missionAlertRewards.items.reduce(
@@ -199,22 +217,6 @@ export class WorldInfoParser {
           }
         }
 
-        const currentZoneType = mission.missionDifficultyInfo.rowName
-          .replace('Theater_', '')
-          .replace('_Group', '')
-        let zoneType = currentZoneType
-
-        if (currentZoneType === StormKingZones.CannyValley) {
-          zoneType = 'Hard_Zone5'
-        } else if (currentZoneType === StormKingZones.TwinePeaks) {
-          zoneType = 'Endgame_Zone5'
-        }
-
-        const powerLevel =
-          (worldPowerLevels as any)[theaterId]?.[zoneType] ??
-          (worldPowerLevels.ventures as any)?.[zoneType] ??
-          0
-
         mission.missionRewards.items.forEach((reward) => {
           filters.push(reward.itemType)
         })
@@ -234,7 +236,7 @@ export class WorldInfoParser {
             },
             tileIndex: tileIndex,
             rewards: missionRewards.map((reward) =>
-              this.parseResource(reward)
+              this.parseResource(reward, { zoneType })
             ),
             zone: {
               zoneType,
@@ -256,12 +258,6 @@ export class WorldInfoParser {
     }
 
     this._parsed = parsed
-
-    console.log(
-      this._parsed['33A2311D4AE64B361CCE27BC9F313C8B'][
-        '4c0daf8d-3ef3-41bc-9617-78573b3dd147'
-      ].mission
-    )
 
     return this._parsed
   }
@@ -288,44 +284,73 @@ export class WorldInfoParser {
     return modifiers
   }
 
-  parseResource({
-    itemType,
-    quantity,
-  }: {
-    itemType: string
-    quantity: number
-  }) {
-    const newKey = itemType
-      .replace(/_((very)?low|medium|(very)?high|extreme)$/gi, '')
-      .replace('AccountResource:', '')
-      .replace('CardPack:zcp_', '')
+  parseResource(
+    {
+      itemType,
+      quantity,
+    }: {
+      itemType: string
+      quantity: number
+    },
+    params?: Partial<{
+      zoneType: string
+    }>
+  ) {
     const data: NonNullable<MissionParsed['alert']>['rewards'][number] = {
       itemType,
       quantity,
-      id: newKey?.replace(/_t\d{2}/, '') ?? null,
+      id: null,
       isBad: null,
       rarity: null,
       tier: null,
       type: null,
     }
 
-    if (this.isEvoMat(itemType)) {
-      data.isBad = !(
-        itemType.endsWith('_veryhigh') || itemType.endsWith('_extreme')
-      )
+    const tier = itemType.match(/.*_t\d+(\d)(_\w+)?$/)
+
+    if (!!tier?.[1]) {
+      data.tier = Number(tier[1])
     }
 
+    if (this.isEvoMat(itemType)) {
+      data.rarity = 'c'
+      data.type = 'AccountResource'
+
+      if (params?.zoneType === EndgameZones.TwinePeaks160) {
+        data.isBad = !(
+          itemType.endsWith('_veryhigh') || itemType.endsWith('_extreme')
+        )
+      }
+
+      return data
+    }
+
+    const newKey = itemType
+      .replace(/_((very)?low|medium|(very)?high|extreme)$/gi, '')
+      .replace('AccountResource:', '')
+      .replace('CardPack:zcp_', '')
+      .replace(/_((very)?low|medium)$/, '')
+
     const rarity = itemType.match(/(\w+)_(c|uc|r|vr|sr|ur)(?:_t\d{2})?\b/)
+
+    data.id = newKey?.replace(/_t\d{2}/, '') ?? null
 
     if (rarity) {
       data.id = rarity?.[1]?.replace(/_t\d{2}/, '') ?? null
       data.rarity = rarity?.[2] ?? null
-    }
 
-    const tier = itemType.match(/.*_t\d+(\d)$/)
+      if (data.rarity && data.id.startsWith('manager')) {
+        /**
+         * Increase rarity: lead survivors
+         */
+        const rarities: Record<string, string> = {
+          uc: 'r',
+          r: 'vr',
+          vr: 'sr',
+        }
 
-    if (!!tier?.[1]) {
-      data.tier = Number(tier[1])
+        data.rarity = rarities[data.rarity] ?? data.rarity
+      }
     }
 
     const type = itemType.match(/^([^:]+):/)

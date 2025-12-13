@@ -28,6 +28,10 @@ export enum StormKingZones {
   TwinePeaks = 'Nightmare_Zone10_Dudebro',
 }
 
+export enum EndgameZones {
+  TwinePeaks160 = 'Endgame_Zone6',
+}
+
 export enum Biomes {
   CriticalMission = 'CriticalMission',
   TheOutpost_PvE_01 = 'TheOutpost_PvE_01',
