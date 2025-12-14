@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { zoneCategories } from '../../../config/contants'
+import { zoneCategories } from '../config/contants'
 import {
   worldInfoMission,
   worldInfoMissionAlert,
