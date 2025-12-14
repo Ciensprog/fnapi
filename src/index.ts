@@ -1,3 +1,1 @@
-export function service() {
-  return 'service'
-}
+export {}

@@ -5,7 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'parsers/stw/index': 'src/parsers/stw/index.ts',
   },
-  exports: true,
+  dts: true,
   format: ['esm', 'cjs'],
   minify: true,
   nodeProtocol: true,
