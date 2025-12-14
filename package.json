@@ -1,6 +1,6 @@
 {
   "name": "@ciensprog/fnapi",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Utilities for making requests to the Fortnite API and data formatters",
   "type": "module",
   "license": "MIT",
