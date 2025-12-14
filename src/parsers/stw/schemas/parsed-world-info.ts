@@ -11,11 +11,6 @@ export type MissionParsed = z.infer<typeof missionParsedSchema>
 export type WorldInfoParsed = z.infer<typeof worldInfoParsedSchema>
 
 export const missionParsedSchema = z.object({
-  raw: z.object({
-    alert: worldInfoMissionAlert.nullable(),
-    mission: worldInfoMission,
-  }),
-
   filters: z.array(z.string()),
   theaterId: z.string(),
 
@@ -70,6 +65,13 @@ export const missionParsedSchema = z.object({
       tile: worldInfoTileSchema,
     }),
   }),
+
+  raw: z
+    .object({
+      alert: worldInfoMissionAlert.nullable(),
+      mission: worldInfoMission,
+    })
+    .optional(),
 })
 
 export const worldInfoParsedSchema = z.record(

@@ -16,13 +16,13 @@ describe('Parsing world info v1', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv1)
+    worldInfo.updateData({ data: wiv1 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv1)
+    worldInfo.updateData({ data: wiv1 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -30,8 +30,7 @@ describe('Parsing world info v1', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv1,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -42,8 +41,7 @@ describe('Parsing world info v1', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv1,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })
@@ -55,13 +53,13 @@ describe('Parsing world info v2', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv2)
+    worldInfo.updateData({ data: wiv2 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv2)
+    worldInfo.updateData({ data: wiv2 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -69,8 +67,7 @@ describe('Parsing world info v2', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv2,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -81,8 +78,7 @@ describe('Parsing world info v2', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv2,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })
@@ -94,13 +90,13 @@ describe('Parsing world info v3', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv3)
+    worldInfo.updateData({ data: wiv3 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv3)
+    worldInfo.updateData({ data: wiv3 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -108,8 +104,7 @@ describe('Parsing world info v3', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv3,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -120,8 +115,7 @@ describe('Parsing world info v3', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv3,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })
@@ -133,13 +127,13 @@ describe('Parsing world info v4', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv4)
+    worldInfo.updateData({ data: wiv4 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv4)
+    worldInfo.updateData({ data: wiv4 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -147,8 +141,7 @@ describe('Parsing world info v4', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv4,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -159,8 +152,7 @@ describe('Parsing world info v4', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv4,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })
@@ -172,13 +164,13 @@ describe('Parsing world info v5', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv5)
+    worldInfo.updateData({ data: wiv5 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv5)
+    worldInfo.updateData({ data: wiv5 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -186,8 +178,7 @@ describe('Parsing world info v5', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv5,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -198,8 +189,7 @@ describe('Parsing world info v5', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv5,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })
@@ -211,13 +201,13 @@ describe('Parsing world info v6', () => {
 
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv6)
+    worldInfo.updateData({ data: wiv6 })
     expect(worldInfo.raw).not.toBeNull()
 
     worldInfo.updateData()
     expect(worldInfo.raw).toBeNull()
 
-    worldInfo.updateData(wiv6)
+    worldInfo.updateData({ data: wiv6 })
     expect(worldInfo.raw).not.toBeNull()
   })
 
@@ -225,8 +215,7 @@ describe('Parsing world info v6', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv6,
     })
-    const parsed = worldInfo.parse()
-    const validation = Object.keys(parsed)
+    const validation = Object.keys(worldInfo.parsed)
 
     expect(
       validation.every((theaterId) => availableWorlds.includes(theaterId))
@@ -237,8 +226,7 @@ describe('Parsing world info v6', () => {
     const worldInfo = new WorldInfoParser({
       data: wiv6,
     })
-    const parsed = worldInfo.parse()
-    const result = worldInfoParsedSchema.safeParse(parsed)
+    const result = worldInfoParsedSchema.safeParse(worldInfo.parsed)
 
     expect(result.success).toBe(true)
   })

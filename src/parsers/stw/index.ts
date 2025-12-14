@@ -29,6 +29,7 @@ export {
 
 export type WorldInfoParserConfig = {
   data?: WorldInfo | null
+  includeRawData?: true
 }
 
 export class WorldInfoParser {
@@ -36,7 +37,7 @@ export class WorldInfoParser {
   private _parsed: WorldInfoParsed = {}
 
   constructor(config?: WorldInfoParserConfig) {
-    this.updateData(config?.data)
+    this.updateData(config)
   }
 
   /**
@@ -56,29 +57,44 @@ export class WorldInfoParser {
   /**
    * Override world info data
    */
-  updateData(value?: WorldInfoParserConfig['data']) {
-    if (!value) {
+  updateData(config?: WorldInfoParserConfig) {
+    if (!config) {
       this._data = null
+      this._parsed = {}
 
       return
     }
 
-    const result = worldInfoSchema.safeParse(value)
+    const result = WorldInfoParser.parse(config)
 
     if (result.success) {
-      this._data = result.data
+      this._data = config.data!
+      this._parsed = result.parsed
     }
   }
 
   /**
    * Parse original data
    */
-  parse(value?: WorldInfoParserConfig['data']): WorldInfoParsed {
-    const worldInfo = worldInfoSchema.safeParse(value).data ?? this._data
+  static parse(
+    config: Pick<WorldInfoParserConfig, 'data' | 'includeRawData'>
+  ):
+    | {
+        parsed: WorldInfoParsed
+        success: true
+      }
+    | {
+        parsed: null
+        success: false
+      } {
+    const worldInfo = worldInfoSchema.safeParse(config?.data).data
     const parsed: WorldInfoParsed = {}
 
     if (!worldInfo) {
-      return parsed
+      return {
+        parsed: null,
+        success: false,
+      }
     }
 
     const tiles: Record<string, WorldInfoTheater['tiles']> = {}
@@ -226,25 +242,24 @@ export class WorldInfoParser {
               tile,
             },
           },
+        }
 
-          raw: {
+        if (config.includeRawData) {
+          parsed[theaterId][missionGuid].raw = {
             alert,
             mission,
-          },
+          }
         }
       })
     })
 
-    if (value) {
-      return parsed
+    return {
+      parsed,
+      success: true,
     }
-
-    this._parsed = parsed
-
-    return this._parsed
   }
 
-  isEvoMat(value: string) {
+  static isEvoMat(value: string) {
     return (
       value.includes('reagent_c_t01') ||
       value.includes('reagent_c_t02') ||
@@ -253,7 +268,9 @@ export class WorldInfoParser {
     )
   }
 
-  parseModifiers(value: WorldInfoMissionAlert['missionAlertModifiers']) {
+  static parseModifiers(
+    value: WorldInfoMissionAlert['missionAlertModifiers']
+  ) {
     const modifiers: MissionParsed['mission']['modifiers'] = []
 
     value?.items.forEach((item) => {
@@ -266,7 +283,7 @@ export class WorldInfoParser {
     return modifiers
   }
 
-  parseResource(
+  static parseResource(
     {
       itemType,
       quantity,
@@ -311,6 +328,7 @@ export class WorldInfoParser {
       .replace(/_((very)?low|medium|(very)?high|extreme)$/gi, '')
       .replace('AccountResource:', '')
       .replace('CardPack:zcp_', '')
+      .replace('_reward', '')
       .replace(/_((very)?low|medium)$/, '')
 
     const rarity = itemType.match(/(\w+)_(c|uc|r|vr|sr|ur)(?:_t\d{2})?\b/)
@@ -344,7 +362,7 @@ export class WorldInfoParser {
     return data
   }
 
-  parseZone({
+  static parseZone({
     missionGenerator,
     powerLevel,
     theaterId,
