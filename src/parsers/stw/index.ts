@@ -9,7 +9,6 @@ import {
   type WorldInfoTheater,
 } from './schemas/world-info'
 import {
-  availableBiomes,
   availableWorlds,
   EndgameZones,
   StormKingZones,
@@ -19,12 +18,10 @@ import {
 } from '../../config/contants'
 
 export {
-  Biomes,
   EndgameZones,
   StormKingZones,
   WorldModifiers,
   Worlds,
-  availableBiomes,
   availableWorlds,
   worldPowerLevels,
   zoneCategories,
@@ -129,10 +126,6 @@ export class WorldInfoParser {
           ] ?? null
         let alertParsed: MissionParsed['alert'] = null
 
-        const zoneTheme = this.parseZone({
-          missionGenerator: mission.missionGenerator,
-          theaterId,
-        })
         const modifiers: MissionParsed['mission']['modifiers'] =
           this.parseModifiers(alert?.missionAlertModifiers)
         const filters: MissionParsed['filters'] = []
@@ -152,6 +145,13 @@ export class WorldInfoParser {
           (worldPowerLevels as any)[theaterId]?.[zoneType] ??
           (worldPowerLevels.ventures as any)?.[zoneType] ??
           0
+
+        const theme = this.parseZone({
+          missionGenerator: mission.missionGenerator,
+          powerLevel,
+          theaterId,
+        })
+        const tile = tiles[theaterId]?.[mission.tileIndex] ?? null
 
         if (alert) {
           const alertRewards = Object.entries(
@@ -199,24 +199,6 @@ export class WorldInfoParser {
           quantity,
         }))
 
-        const tile = tiles[theaterId]?.[mission.tileIndex] ?? null
-        const biome: MissionParsed['mission']['zone']['biome'] = tile
-          ? {
-              id: 'unknown',
-              tile,
-            }
-          : null
-
-        if (biome) {
-          const getBiomeId = availableBiomes.find((item) =>
-            biome.tile.zoneTheme.includes(item)
-          )
-
-          if (getBiomeId) {
-            biome.id = getBiomeId
-          }
-        }
-
         mission.missionRewards.items.forEach((reward) => {
           filters.push(reward.itemType)
         })
@@ -233,15 +215,15 @@ export class WorldInfoParser {
             id: missionGuid,
             difficulty: {
               powerLevel,
+              zoneType,
             },
             tileIndex: tileIndex,
             rewards: missionRewards.map((reward) =>
               this.parseResource(reward, { zoneType })
             ),
             zone: {
-              zoneType,
-              biome,
-              theme: zoneTheme,
+              theme,
+              tile,
             },
           },
 
@@ -364,9 +346,11 @@ export class WorldInfoParser {
 
   parseZone({
     missionGenerator,
+    powerLevel,
     theaterId,
   }: {
     missionGenerator: string
+    powerLevel: number
     theaterId: string
   }) {
     const generator = `${missionGenerator}`.trim()
@@ -385,18 +369,39 @@ export class WorldInfoParser {
     }
 
     const [key, matches] = current
-    const newKey =
-      {
-        [Worlds.Stonewood as string]: key === 'ets' ? 'rescue' : key,
-      }[theaterId] ?? key
-    const isGroup =
-      theaterId === Worlds.Stonewood && newKey === 'rescue'
-        ? false
-        : generator.toLowerCase().includes('group')
+    let newKey = key
+    let isGroup = generator.toLowerCase().includes('group')
+    let currentMatches = matches
+
+    const lowZones: Array<string> = [
+      // Normal
+      Worlds.Stonewood,
+      // Ventures
+      Worlds.BlastedBadlands,
+      Worlds.FlannelFalls,
+      Worlds.FrozenFjords,
+      Worlds.Hexsylvania,
+      Worlds.ScurvyShoals,
+    ]
+
+    if (lowZones.includes(theaterId) && key === 'ets') {
+      newKey = 'rescue'
+      currentMatches = zoneCategories.rescue
+      isGroup = false
+
+      if (
+        theaterId !== Worlds.Stonewood &&
+        powerLevel >= worldPowerLevels.ventures.Phoenix_Zone15
+      ) {
+        newKey = 'ets'
+        currentMatches = zoneCategories.ets
+        isGroup = generator.toLowerCase().includes('group')
+      }
+    }
 
     data.id = newKey
     data.isGroup = isGroup
-    data.matches = matches
+    data.matches = currentMatches
 
     return data
   }

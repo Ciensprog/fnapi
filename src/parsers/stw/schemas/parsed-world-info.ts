@@ -40,6 +40,7 @@ export const missionParsedSchema = z.object({
     id: z.string(),
     difficulty: z.object({
       powerLevel: z.number(),
+      zoneType: z.string(),
     }),
     tileIndex: z.number(),
     modifiers: z.array(
@@ -60,19 +61,13 @@ export const missionParsedSchema = z.object({
       })
     ),
     zone: z.object({
-      zoneType: z.string(),
-      biome: z
-        .object({
-          id: z.string(),
-          tile: worldInfoTileSchema,
-        })
-        .nullable(),
       theme: z.object({
-        id: z.enum(Object.keys(zoneCategories)),
         generator: z.string(),
+        id: z.enum(Object.keys(zoneCategories)),
         isGroup: z.boolean(),
         matches: z.array(z.string()),
       }),
+      tile: worldInfoTileSchema,
     }),
   }),
 })
