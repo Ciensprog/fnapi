@@ -1,3 +1,16 @@
+## [1.4.0](https://github.com/Ciensprog/fnapi/compare/v1.3.0...v1.4.0) (2026-03-12)
+
+### Features
+
+* add endpoints to kill sessions ([d13674d](https://github.com/Ciensprog/fnapi/commit/d13674d51b0b45f24942f5f0c8ea0b3205b15ebb))
+* add token type parameter ([e9d577f](https://github.com/Ciensprog/fnapi/commit/e9d577f1952f9bac4069fb037faec4f48e5ee1f5))
+
+## [1.3.0](https://github.com/Ciensprog/fnapi/compare/v1.2.0...v1.3.0) (2026-03-12)
+
+### Features
+
+* add new services ([b639b77](https://github.com/Ciensprog/fnapi/commit/b639b77ed32746c0647f61a9037e2e838b2dd27c))
+
 ## [1.2.0](https://github.com/Ciensprog/fnapi/compare/v1.1.0...v1.2.0) (2025-12-14)
 
 ### Features
