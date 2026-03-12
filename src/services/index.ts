@@ -1,5 +1,17 @@
 export * from './config/clients'
 export * from './config/schemas'
 
-export * from './base-game'
+export * from './caldera'
+export * from './friends'
+export * from './fulfillment'
+export * from './launcher'
+export * from './lightswitch'
+export * from './matchmaking'
+export * from './mcp'
 export * from './oauth'
+export * from './party'
+export * from './public-account'
+export * from './store-access'
+export * from './storefront'
+
+export * from './shared/lookup'

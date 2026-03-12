@@ -1,14 +1,34 @@
 import type { RequestParamConfig } from '../managers/http'
 
+import { defaultFortniteClient } from './config/clients'
 import { FetchManager } from '../managers/http'
 
 export const oauthService = FetchManager.create(
-  'https://account-public-service-prod.ol.epicgames.com/account/api/oauth'
+  'https://account-public-service-prod.ol.epicgames.com/account/api/oauth',
 )
   .defaultHeaders({
     'Content-Type': 'application/x-www-form-urlencoded',
+    Authorization: `basic ${defaultFortniteClient.use.auth}`,
   })
   .build()
+
+export function createAccessTokenUsingAuthorizationCode(
+  {
+    code,
+  }: {
+    code: string
+  },
+  config?: RequestParamConfig,
+) {
+  return oauthService.post<CreateAccessTokenWithAuthorizationCodeResponse>(
+    '/token',
+    {
+      grant_type: 'authorization_code',
+      code,
+    },
+    config,
+  )
+}
 
 export function createAccessTokenUsingClientCredentials({
   authorization,
@@ -24,13 +44,13 @@ export function createAccessTokenUsingClientCredentials({
       headers: {
         Authorization: `basic ${authorization}`,
       },
-    }
+    },
   )
 }
 
 export function createAccessTokenUsingDeviceAuth(
   { accountId, deviceId, secret }: DeviceAuthConfig,
-  config?: RequestParamConfig
+  config?: RequestParamConfig,
 ) {
   return oauthService.post<AuthorizationCodeResponse>(
     '/token',
@@ -40,8 +60,33 @@ export function createAccessTokenUsingDeviceAuth(
       account_id: accountId,
       device_id: deviceId,
     },
-    config
+    config,
   )
+}
+
+export function createAccessTokenUsingExchangeCode(
+  {
+    exchangeCode: exchange_code,
+    tokenType: token_type,
+  }: {
+    exchangeCode: string
+    tokenType?: string
+  },
+  config?: RequestParamConfig,
+) {
+  return oauthService.post<AuthorizationCommonResponse>(
+    '/token',
+    {
+      grant_type: 'exchange_code',
+      exchange_code,
+      token_type,
+    },
+    config,
+  )
+}
+
+export function createExchangeCode(config: RequestParamConfig) {
+  return oauthService.get<CreateExchangeCodeResponse>('/exchange', config)
 }
 
 export function refreshAccessToken(
@@ -52,7 +97,7 @@ export function refreshAccessToken(
     grant_type?: string
     refresh_token: string
   },
-  config?: RequestParamConfig
+  config?: RequestParamConfig,
 ) {
   return oauthService.post<RefreshTokenResponse>(
     '/token',
@@ -60,7 +105,7 @@ export function refreshAccessToken(
       grant_type,
       refresh_token,
     },
-    config
+    config,
   )
 }
 
@@ -101,6 +146,11 @@ export type AuthorizationCommonResponse<ExtraProps = unknown> =
     auth_time: string
   }
 
+export type CreateAccessTokenWithAuthorizationCodeResponse =
+  AuthorizationCommonResponse<{
+    scope: Array<string>
+  }>
+
 export type CreateAccessTokenWithClientCredentialsResponse = {
   access_token: string
   expires_in: number
@@ -116,6 +166,12 @@ export type CreateAccessTokenWithClientCredentialsResponse = {
 export type AuthorizationCodeResponse = AuthorizationCommonResponse<{
   scope: Array<string>
 }>
+
+export type CreateExchangeCodeResponse = {
+  expiresInSeconds: number
+  code: string
+  creatingClientId: string
+}
 
 export type RefreshTokenResponse = AuthorizationCommonResponse
 

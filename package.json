@@ -45,6 +45,8 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
+    "dayjs": "1.11.19",
+    "immer": "11.1.4",
     "zod": "4.1.13"
   },
   "devDependencies": {

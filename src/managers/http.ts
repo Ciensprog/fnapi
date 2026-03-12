@@ -27,10 +27,14 @@ type ApiError = {
   numericErrorCode: number
   originatingService: string
   intent: string
+  continuationUrl?: string
+  correctiveAction?: string
 }
 
 export enum FNApiErrorCode {
   AccountNotFound = 'account_not_found',
+  AuthorizationCodeNotFound = 'authorization_code_not_found',
+  CorrectiveAction = 'corrective_action_required',
   InvalidAccountCredentials = 'invalid_account_credentials',
   InvalidToken = 'invalid_token',
   OperationForbidden = 'operation_forbidden',
@@ -45,7 +49,7 @@ export class FetchManager {
 
   constructor(
     baseURL: string,
-    defaultHeaders: Record<string, string> = {}
+    defaultHeaders: Record<string, string> = {},
   ) {
     this.baseURL = baseURL
     this.defaultHeaders = defaultHeaders
@@ -78,7 +82,7 @@ export class FetchManager {
       currentConfig = await interceptor(currentConfig)
     }
 
-    let body: RequestInit['body'] | undefined
+    let body: BodyInit | undefined
 
     if (currentConfig.data) {
       if (
@@ -97,13 +101,13 @@ export class FetchManager {
       ) {
         body = JSON.stringify(currentConfig.data)
       } else {
-        body = currentConfig.data as RequestInit['body']
+        body = currentConfig.data as BodyInit
       }
     }
 
     const urlWithParams = this.buildUrlWithParams(
       currentConfig.url,
-      currentConfig.params
+      currentConfig.params,
     )
     const newConfig: RequestInit = {
       method: currentConfig.method,
@@ -122,13 +126,36 @@ export class FetchManager {
     //   throw new Error(`HTTP error! status: ${response.status}`)
     // }
 
-    const result: any = await response.json()
+    const result =
+      response.body !== null
+        ? await response.json()
+        : {
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+          }
 
     if (result.errorCode) {
       if (result.errorCode.includes(FNApiErrorCode.AccountNotFound)) {
         throw new FNApiErrorAccountNotFound(
           result,
-          result.errorMessage ?? 'Generic API Error'
+          result.errorMessage ?? 'Generic API Error',
+        )
+      }
+
+      if (
+        result.errorCode.includes(FNApiErrorCode.AuthorizationCodeNotFound)
+      ) {
+        throw new FNApiErrorAuthorizationCodeNotFound(
+          result,
+          result.errorMessage ?? 'Generic API Error',
+        )
+      }
+
+      if (result.errorCode.includes(FNApiErrorCode.CorrectiveAction)) {
+        throw new FNApiErrorCorrectiveAction(
+          result,
+          result.errorMessage ?? 'Generic API Error',
         )
       }
 
@@ -137,34 +164,34 @@ export class FetchManager {
       ) {
         throw new FNApiErrorInvalidCredentials(
           result,
-          result.errorMessage ?? 'Generic API Error'
+          result.errorMessage ?? 'Generic API Error',
         )
       }
 
       if (result.errorCode.includes(FNApiErrorCode.InvalidToken)) {
         throw new FNApiErrorInvalidToken(
           result,
-          result.errorMessage ?? 'Generic API Error'
+          result.errorMessage ?? 'Generic API Error',
         )
       }
 
       if (result.errorCode.includes(FNApiErrorCode.OperationForbidden)) {
         throw new FNApiErrorOperationForbidden(
           result,
-          result.errorMessage ?? 'Generic API Error'
+          result.errorMessage ?? 'Generic API Error',
         )
       }
 
       if (result.errorCode.includes(FNApiErrorCode.RateLimit)) {
         throw new FNApiErrorRateLimit(
           result,
-          result.errorMessage ?? 'Generic API Error'
+          result.errorMessage ?? 'Generic API Error',
         )
       }
 
       throw new FNApiError(
         result,
-        result.errorMessage ?? 'Generic API Error'
+        result.errorMessage ?? 'Generic API Error',
       )
     }
 
@@ -189,7 +216,7 @@ export class FetchManager {
 
   private buildUrlWithParams(
     url: string,
-    params?: Record<string, number | string>
+    params?: Record<string, number | string>,
   ): string {
     if (!params) return url
 
@@ -204,9 +231,9 @@ export class FetchManager {
 
   static async serverFetch<Data>(
     url: string,
-    config?: Omit<FetchConfig, 'url'>
+    config?: Omit<FetchConfig, 'url'>,
   ): Promise<Data> {
-    const response: any = await fetch(url, {
+    const response = await fetch(url, {
       ...config,
       headers: {
         'Content-Type': 'application/json',
@@ -281,6 +308,52 @@ export class FNApiErrorAccountNotFound extends Error {
     }
 
     this.name = 'FNApiErrorAccountNotFound'
+    this.result = result
+    this.code = result.errorCode.toLowerCase() ?? '-1'
+    this.date = new Date()
+  }
+}
+
+/**
+ * @see https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Error
+ */
+export class FNApiErrorAuthorizationCodeNotFound extends Error {
+  code: string
+  date: Date
+  result: ApiError
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(result: ApiError, ...params: Array<any>) {
+    super(...params)
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FNApiErrorAuthorizationCodeNotFound)
+    }
+
+    this.name = 'FNApiErrorAuthorizationCodeNotFound'
+    this.result = result
+    this.code = result.errorCode.toLowerCase() ?? '-1'
+    this.date = new Date()
+  }
+}
+
+/**
+ * @see https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Error
+ */
+export class FNApiErrorCorrectiveAction extends Error {
+  code: string
+  date: Date
+  result: ApiError
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(result: ApiError, ...params: Array<any>) {
+    super(...params)
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, FNApiErrorCorrectiveAction)
+    }
+
+    this.name = 'FNApiErrorCorrectiveAction'
     this.result = result
     this.code = result.errorCode.toLowerCase() ?? '-1'
     this.date = new Date()
