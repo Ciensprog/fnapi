@@ -85,7 +85,7 @@ export function createAccessTokenUsingExchangeCode(
   )
 }
 
-export function createExchangeCode(config: RequestParamConfig) {
+export function createExchangeCode(config?: RequestParamConfig) {
   return oauthService.get<CreateExchangeCodeResponse>('/exchange', config)
 }
 
