@@ -49,7 +49,14 @@ export function createAccessTokenUsingClientCredentials({
 }
 
 export function createAccessTokenUsingDeviceAuth(
-  { accountId, deviceId, secret }: DeviceAuthConfig,
+  {
+    accountId,
+    deviceId,
+    secret,
+    tokenType,
+  }: DeviceAuthConfig & {
+    tokenType?: string
+  },
   config?: RequestParamConfig,
 ) {
   return oauthService.post<AuthorizationCodeResponse>(
@@ -59,6 +66,7 @@ export function createAccessTokenUsingDeviceAuth(
       grant_type: 'device_auth',
       account_id: accountId,
       device_id: deviceId,
+      token_type: tokenType,
     },
     config,
   )
