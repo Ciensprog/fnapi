@@ -125,6 +125,35 @@ export function verifyToken(config?: RequestParamConfig) {
   >('/verify', config)
 }
 
+/**
+ * @param type ALL_ACCOUNT_CLIENT Account: account:token:allSessionsForAccountClient DELETE. Kills every Auth Session for this Client for the logged in Account (including the current Session).
+ * @param type ALL Account: account:token:otherSessionsForAccountClientService DELETE. Kills all other Auth Sessions for the same Client for Service for the logged in Account (used in Fortnite).
+ * @param type OTHERS_ACCOUNT_CLIENT_SERVICE Account: account:token:otherSessionsForAccountClientService DELETE. Kills all other Auth Sessions for the same Client for Service for the logged in Account (used in Fortnite).
+ * @param type OTHERS_ACCOUNT_CLIENT Account: account:token:otherSessionsForAccountClient DELETE. Kills all other Auth Sessions for the same Client for the logged in Account.
+ * @param type OTHERS_SAME_SOURCE_ID Account: account:token:otherSessionsWithSameSourceId DELETE. Kills all session from the same source???
+ * @param type OTHERS Client: account:token:otherSessionsForClient DELETE
+Account: account:token:otherSessionsForAccount DELETE. Kills all Other Auth Sessions
+ * @param config RequestParamConfig
+ *
+ * @url https://github.com/LeleDerGrasshalmi/FortniteEndpointsDocumentation/blob/main/EpicGames/AccountService/Authentication/Kill/Sessions.md
+ */
+export function killAllSessions(
+  type:
+    | 'ALL_ACCOUNT_CLIENT'
+    | 'ALL'
+    | 'OTHERS_ACCOUNT_CLIENT_SERVICE'
+    | 'OTHERS_ACCOUNT_CLIENT'
+    | 'OTHERS_SAME_SOURCE_ID'
+    | 'OTHERS',
+  config?: RequestParamConfig,
+) {
+  return oauthService.delete(`/sessions/kill?killType=${type}`, config)
+}
+
+export function killSession(token: string, config?: RequestParamConfig) {
+  return oauthService.delete(`/sessions/kill/${token}`, config)
+}
+
 export type DeviceAuthConfig = {
   accountId: string
   deviceId: string
