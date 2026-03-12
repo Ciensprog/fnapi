@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/Ciensprog/fnapi/compare/v1.1.0...v1.2.0) (2025-12-14)
+
+### Features
+
+* add services ([4e17446](https://github.com/Ciensprog/fnapi/commit/4e17446a55625a2822339adb6e960a58c7554cb1))
+
 ## 1.1.0 (2025-12-14)
 
 ### Features
