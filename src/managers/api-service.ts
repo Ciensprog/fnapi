@@ -100,10 +100,17 @@ export class ApiService {
         ? structuredClone(lastArg)
         : { headers: {} }
 
-      let account = this.getRandomAccount()
+      let account: Account | undefined = undefined
 
       if (typeof overrideAccount === 'string') {
         account = this.findAccount(overrideAccount)
+      } else if (
+        overrideAccount !== null &&
+        overrideAccount !== undefined
+      ) {
+        account = overrideAccount
+      } else {
+        account = this.getRandomAccount()
       }
 
       const parseAccount = accountSchema.safeParse(overrideAccount)
