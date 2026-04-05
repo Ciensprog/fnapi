@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/Ciensprog/fnapi/compare/v1.4.1...v1.4.2) (2026-04-05)
+
+### Bug Fixes
+
+* update validations ([088f089](https://github.com/Ciensprog/fnapi/commit/088f0891c93a11d7ffd6e68e1d6934010b6ce73b))
+
 ## [1.4.1](https://github.com/Ciensprog/fnapi/compare/v1.4.0...v1.4.1) (2026-04-05)
 
 ### Bug Fixes
