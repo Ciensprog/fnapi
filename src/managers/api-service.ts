@@ -182,7 +182,10 @@ export class ApiService {
             error: null,
           }
         } catch (error: any) {
-          if (error instanceof FNApiErrorRateLimit) {
+          if (
+            error instanceof FNApiErrorRateLimit ||
+            error?.code?.includes(FNApiErrorCode.RateLimit)
+          ) {
             if (!account) {
               break
             }
@@ -194,7 +197,10 @@ export class ApiService {
             )
           }
 
-          if (error instanceof FNApiErrorInvalidToken) {
+          if (
+            error instanceof FNApiErrorInvalidToken ||
+            error?.code?.includes(FNApiErrorCode.InvalidToken)
+          ) {
             if (!account) {
               break
             }
@@ -213,6 +219,35 @@ export class ApiService {
             currentTries++
 
             continue
+          }
+
+          if (
+            error instanceof FNApiErrorInvalidCredentials ||
+            error?.code?.includes(FNApiErrorCode.InvalidAccountCredentials)
+          ) {
+            if (!account) {
+              break
+            }
+
+            if (removeInsteadOfDisable) {
+              this.removeAccount({
+                accountId: account.accountId,
+                type: 'available',
+              })
+            } else {
+              this.disableAccount(account.accountId, true)
+            }
+
+            if (overrideOnInvalidCredentials) {
+              account = this.getRandomAccount()
+
+              continue
+            }
+
+            return {
+              data: null,
+              error: parseErrorCode(error.code),
+            }
           }
 
           if (error instanceof FNApiError || error?.code !== undefined) {
@@ -303,13 +338,19 @@ export class ApiService {
         },
         error: null,
       }
-    } catch (error) {
-      if (error instanceof FNApiErrorInvalidCredentials) {
+    } catch (error: any) {
+      if (
+        error instanceof FNApiErrorInvalidCredentials ||
+        error?.code?.includes(FNApiErrorCode.InvalidAccountCredentials)
+      ) {
         return {
           data: null,
           error: FNApiErrorCode.InvalidAccountCredentials,
         }
-      } else if (error instanceof FNApiError) {
+      } else if (
+        error instanceof FNApiError ||
+        error?.code !== undefined
+      ) {
         return {
           data: null,
           error: error.code,
@@ -363,13 +404,19 @@ export class ApiService {
         },
         error: null,
       }
-    } catch (error) {
-      if (error instanceof FNApiErrorInvalidCredentials) {
+    } catch (error: any) {
+      if (
+        error instanceof FNApiErrorInvalidCredentials ||
+        error?.code?.includes(FNApiErrorCode.InvalidAccountCredentials)
+      ) {
         return {
           data: null,
           error: FNApiErrorCode.InvalidAccountCredentials,
         }
-      } else if (error instanceof FNApiError) {
+      } else if (
+        error instanceof FNApiError ||
+        error?.code !== undefined
+      ) {
         return {
           data: null,
           error: error.code,
